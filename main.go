@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -13,7 +14,10 @@ import (
 func main() {
 	log.Printf("Starting API Server")
 
-	port := flag.String("port", "", "port to run the API on")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	// esURL := flag.String("esurl", "", "Elasticsearch service URL")
 	// esPWD := flag.String("espwd", "", "Elasticsearch service password")
 
@@ -29,11 +33,18 @@ func main() {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Welcome to notelog-api"))
+		w.Write([]byte("Welcome to notelog-api root."))
 	})
 
-	log.Printf("Listening On Port: %s", *port)
+	//Routes for GitHub Repos
+	r.Route("/github", func(r chi.Router) {
+		r.Route("/", func(r chi.Router) {
+			r.Get("/", GetGitHubRepo)
+		})
+	})
+
+	log.Printf("Listening On Port: %s", port)
 
 	// Start the HTTP Server
-	http.ListenAndServe(":"+*port, r)
+	http.ListenAndServe(":"+port, r)
 }
