@@ -42,6 +42,11 @@ func main() {
 			r.Get("/", GetGitHubRepo)
 		})
 	})
+	r.Route("/blog", func(r chi.Router) {
+		r.Route("/", func(r chi.Router) {
+			r.Get("/", GetBlog)
+		})
+	})
 
 	log.Printf("Listening On Port: %s", port)
 
